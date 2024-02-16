@@ -2,17 +2,29 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
+const int BUFFER_LEN = 25;
+
 int
 main(int argc, char *argv[])
 {
   char buffer[25];
-   
-  if (!gets(buffer, 25)) {
-    // failure
-    write(2, "sum: read failure\n", 23);
-    exit(1);
+
+  char *buffer_read_pos = buffer;
+  for (int i = 0; i < 25; i++) {
+    if (read(0, buffer_read_pos, 1) != 1) {
+      // failure
+      write(2, "sum: read failure\n", 23);
+      exit(1);
+    }
+
+    if (*buffer_read_pos == '\0' ||
+        *buffer_read_pos == '\n' ||
+        *buffer_read_pos == '\r')
+      break;
+
+    buffer_read_pos++;
   }
-  
+
   char *ptr1 = buffer, *ptr2 = strchr(buffer, ' ');
   
   if (!ptr2) {

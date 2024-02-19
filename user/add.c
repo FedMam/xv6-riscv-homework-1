@@ -23,6 +23,8 @@ main(int argc, char *argv[]) {
   
   int num1 = atoi(ptr1), num2 = atoi(ptr2); // incorrect string converts to 0
   
-  add(num1, num2); // syscall
+  int sum = add(num1, num2); // syscall
+
+  printf("%d\n", sum);
   exit(0);
 }

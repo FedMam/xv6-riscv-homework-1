@@ -11,7 +11,10 @@ main(int argc, char *argv[])
 
   char *buffer_read_pos = buffer;
   for (int i = 0; i < 25; i++) {
-    if (read(0, buffer_read_pos, 1) != 1) {
+    int read_response = read(0, buffer_read_pos, 1);
+    if (read_response == 0)
+      break;
+    else if (read_response < 0) {
       // failure
       write(2, "sum: read failure\n", 23);
       exit(1);

@@ -21,6 +21,11 @@ main(int argc, char* argv[])
     else
     {
         // in parent process
+        if (kill(pid) == -1) {
+            printf("task: kill failure\n");
+            exit(1);
+        }
+        
         int exit_status;
         pid = wait(&exit_status);
         printf("child process %d finished with exit code %d\n", pid, exit_status);

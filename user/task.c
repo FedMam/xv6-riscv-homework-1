@@ -21,7 +21,8 @@ main(int argc, char* argv[])
     else
     {
         // in parent process
-        if (kill(pid) == -1) {
+        if (kill(pid) == -1)
+        {
             printf("task: kill failure\n");
             exit(1);
         }

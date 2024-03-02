@@ -43,23 +43,13 @@ main(int argc, char* argv[])
         // in child process
         close(pipe_fd[1]);
 
-        char inp;
-        while (1)
-        {
-            int read_status = read(pipe_fd[0], &inp, 1);
-            if (read_status == -1)
-            {
-                printf("task (child): read failure\n");
-                exit(1);
-            }
-            if (read_status == 0 || inp == '\0')
-            {
-                break;
-            }
-            printf("%c", inp);
-        }
-
+        close(0);
+        dup(pipe_fd[0]);
         close(pipe_fd[0]);
+
+        char *argv[] = {"/wc", 0};
+        exec("/wc", argv);
+        
         exit(0);
     }
 }

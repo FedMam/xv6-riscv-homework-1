@@ -25,14 +25,15 @@ main(int argc, char* argv[])
     else if (pid == 0)
     {
         // in parent process
+        close(pipe_fd[0]);
+
+        char lf = '\n';
         for (int i = 0; i < argc; i++) 
         {
             write(pipe_fd[1], argv[i], strlen(argv[i]));
+            write(pipe_fd[1], &lf, 1);
         }
 
-        char lf = '\n';
-        write(pipe_fd[1], &lf, 1);
-        close(pipe_fd[0]);
         close(pipe_fd[1]);
         wait(0);
         exit(0);
@@ -40,6 +41,8 @@ main(int argc, char* argv[])
     else 
     {
         // in child process
+        close(pipe_fd[1]);
+
         char inp;
         while (1)
         {
@@ -49,13 +52,14 @@ main(int argc, char* argv[])
                 printf("task (child): read failure\n");
                 exit(1);
             }
-            printf("%c", inp);
-
-            if (read_status == 0 || inp == '\n' || inp == '\0')
+            if (read_status == 0 || inp == '\0')
             {
                 break;
             }
+            printf("%c", inp);
         }
+
+        close(pipe_fd[0]);
         exit(0);
     }
 }

@@ -15,7 +15,7 @@ main(int argc, char* argv[])
     else if (pid == 0)
     {
         // in child process
-        sleep(10);
+        sleep(50);
         exit(1);
     }
     else

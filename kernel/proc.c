@@ -681,3 +681,35 @@ procdump(void)
     printf("\n");
   }
 }
+
+int
+proclistinfo(struct procinfo *plist, int lim) {
+  struct proc *p;
+
+  int i = 0, proc_count = 0;
+  struct procinfo *plist_curr = plist;
+
+  pagetable_t pagetable = myproc()->pagetable;
+  int err = -1;
+
+  for(p = proc; p < &proc[NPROC]; p++, i++) {
+    if (!p || p->pid == 0) continue;
+
+    acquire(&p->lock);
+    proc_count++;
+
+    if (plist && proc_count <= lim) {
+      if (copyout(pagetable, (uint64)&(plist_curr->pid), (char*)&(p->pid), sizeof(int) * 1) == -1) { release(&p->lock); return -1; }
+      if (copyout(pagetable, (uint64)&(plist_curr->name), (char*)&(p->name), sizeof(char) * strlen(p->name)) == -1) { release(&p->lock); return -1; }
+      if (copyout(pagetable, (uint64)&(plist_curr->state), (char*)&(p->state), sizeof(int) * 1) == -1) { release(&p->lock); return -1; }
+      if (copyout(pagetable, (uint64)&(plist_curr->parent_pid),
+        p->parent ? (char*)&(p->parent->pid) : (char*)&err, sizeof(int) * 1) == -1) { release(&p->lock); return -1; }
+    }
+
+    release(&p->lock);
+    if (plist && proc_count <= lim)
+      plist_curr++;
+  }
+
+  return proc_count;
+}

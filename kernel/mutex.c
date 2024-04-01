@@ -89,6 +89,7 @@ closemutex(int mutex_id)
   acquire(&mtable.lock);
   if (mtable.mutexes[mutex_id].used_by == 0) {
     release(&mtable.lock);
+
     return -1;
   }
   else {

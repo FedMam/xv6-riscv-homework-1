@@ -65,10 +65,11 @@ main(int argc, char* argv[]) {
 
     char inp;
     while (1) {
-        if (use_lock) acqmtx(mutex_id);
         int read_status = read(ptoc_pipe[0], &inp, 1);
         if (read_status == -1) {
+            if (use_lock) acqmtx(mutex_id);
             printf("task (child): read failure\n");
+            if (use_lock) relmtx(mutex_id);
             close(ctop_pipe[1]);
             close(ptoc_pipe[0]);
             exit(-4);
@@ -76,15 +77,18 @@ main(int argc, char* argv[]) {
         if (read_status == 0 || inp == '\0') {
             break;
         }
+        if (use_lock) acqmtx(mutex_id);
         printf("%d: received '%c'\n", pid, inp);
+        if (use_lock) relmtx(mutex_id);
 
         if (write(ctop_pipe[1], &inp, 1) == -1) {
+          if (use_lock) acqmtx(mutex_id);
           printf("task (child): write failure\n");
+          if (use_lock) relmtx(mutex_id);
           close(ctop_pipe[1]);
           close(ptoc_pipe[0]);
           exit(-4);
         }
-        if (use_lock) relmtx(mutex_id);
     }
 
     close(ctop_pipe[1]);
@@ -97,29 +101,33 @@ main(int argc, char* argv[]) {
     close(ctop_pipe[1]);
     close(ptoc_pipe[0]);
 
-    if (use_lock) acqmtx(mutex_id);
+    // if (use_lock) acqmtx(mutex_id);
     if (write(ptoc_pipe[1], test_string, strlen(test_string) + 1) == -1) {
+      if (use_lock) acqmtx(mutex_id);
       printf("task (parent): write failure\n");
+      if (use_lock) relmtx(mutex_id);
       close(ptoc_pipe[1]);
       close(ctop_pipe[0]);
       exit(-5);
     }
-    if (use_lock) relmtx(mutex_id);
+    // if (use_lock) relmtx(mutex_id);
 
     close(ptoc_pipe[1]);
 
     char inp;
     while (1) {
-        if (use_lock) acqmtx(mutex_id);
         int read_status = read(ctop_pipe[0], &inp, 1);
         if (read_status == -1) {
+            if (use_lock) acqmtx(mutex_id);
             printf("task (parent): read failure\n");
+            if (use_lock) relmtx(mutex_id);
             close(ctop_pipe[0]);
             exit(-5);
         }
         if (read_status == 0 || inp == '\0') {
             break;
         }
+        if (use_lock) acqmtx(mutex_id);
         printf("%d: received '%c'\n", pid, inp);
         if (use_lock) relmtx(mutex_id);
     }

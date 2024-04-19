@@ -31,6 +31,9 @@ exec(char *path, char **argv)
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
 
+  // Write message to buffer
+  pr_msg("process %d executing command %s", p->pid, path);
+
   begin_op();
 
   if((ip = namei(path)) == 0){

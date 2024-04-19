@@ -59,6 +59,16 @@ void            ramdiskinit(void);
 void            ramdiskintr(void);
 void            ramdiskrw(struct buf*);
 
+// dbuffer.c
+void            dbufferinit(void);
+void            dbufferwrite(const char*, uint);
+int             dbufferread(char*, uint);
+int             dbufferreadnterm(char*, uint);
+int             dbuffercopyout(uint64, uint);
+void            pr_msg(const char*, ...);
+// --
+void            dbufferdebug(void);
+
 // kalloc.c
 void*           kalloc(void);
 void            kfree(void *);

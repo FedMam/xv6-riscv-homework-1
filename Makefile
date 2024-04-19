@@ -13,11 +13,13 @@ OBJS = \
   $K/main.o \
   $K/vm.o \
   $K/proc.o \
+  $K/dbuffer.o \
   $K/swtch.o \
   $K/trampoline.o \
   $K/trap.o \
   $K/syscall.o \
   $K/sysproc.o \
+  $K/sysdbuffer.o \
   $K/bio.o \
   $K/fs.o \
   $K/log.o \
@@ -117,6 +119,8 @@ mkfs/mkfs: mkfs/mkfs.c $K/fs.h $K/param.h
 
 UPROGS=\
 	$U/_cat\
+	$U/_dmesg\
+	$U/_dmesgfill\
 	$U/_echo\
 	$U/_forktest\
 	$U/_grep\
@@ -131,7 +135,7 @@ UPROGS=\
 	$U/_usertests\
 	$U/_grind\
 	$U/_wc\
-	$U/_zombie\
+	$U/_zombie
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

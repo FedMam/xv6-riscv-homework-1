@@ -186,6 +186,10 @@ pr_msg(const char *fmt, ...) {
                 for(; *s; s++)
                     dbufferputc_nolock(*s);
             }
+            else if (c == 'c') {
+                // added this format for convenience
+                dbufferputc_nolock(va_arg(ap, char));
+            }
             else if (c == '%') {
                 dbufferputc_nolock('%');
             }

@@ -32,7 +32,7 @@ exec(char *path, char **argv)
   struct proc *p = myproc();
 
   // Write message to buffer
-  pr_msg("process %d executing command %s", p->pid, path);
+  pr_msg("EXEC: process %d executing program %s", p->pid, path);
 
   begin_op();
 

@@ -17,7 +17,11 @@ main(int argc, char* argv[]) {
     
     dmesg(buf, size);
 
-    printf("%s", buf);
+    // это вместо printf, который может зависнуть
+    for (char* p = buf; *p != 0; p++) {
+        char singlechar[] = {*p, 0};
+        printf(singlechar);
+    }
     free(buf);
     exit(0);
 }

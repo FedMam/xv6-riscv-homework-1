@@ -158,9 +158,9 @@ pr_msg(const char *fmt, ...) {
         panic("pr_msg: null fmt");
 
     dbufferputc_nolock('[');
-    acquire(&tickslock);
+    // acquire(&tickslock);
     dbufferwriteint_nolock(ticks);
-    release(&tickslock);
+    // release(&tickslock);
     dbufferputc_nolock(']');
     dbufferputc_nolock(' ');
 

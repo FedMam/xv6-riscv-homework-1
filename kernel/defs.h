@@ -59,6 +59,16 @@ void            ramdiskinit(void);
 void            ramdiskintr(void);
 void            ramdiskrw(struct buf*);
 
+// dbuffer.c
+void            dbufferinit(void);
+void            dbufferwrite(const char*, uint);
+int             dbufferread(char*, uint);
+int             dbufferreadnterm(char*, uint);
+int             dbuffercopyout(uint64, uint);
+void            pr_msg(const char*, ...);
+// --
+void            dbufferdebug(void);
+
 // kalloc.c
 void*           kalloc(void);
 void            kfree(void *);
@@ -123,6 +133,15 @@ void            acquiresleep(struct sleeplock*);
 void            releasesleep(struct sleeplock*);
 int             holdingsleep(struct sleeplock*);
 void            initsleeplock(struct sleeplock*, char*);
+
+// mutex.c
+void            mutexinit(void);
+int             newmutex();
+int             usemutex(int);
+int             acquiremutex(int);
+int             releasemutex(int);
+int             holdingmutex(int);
+int             closemutex(int);
 
 // string.c
 int             memcmp(const void*, const void*, uint);

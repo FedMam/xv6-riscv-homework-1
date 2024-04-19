@@ -309,6 +309,8 @@ virtio_disk_intr()
   // the device increments disk.used->idx when it
   // adds an entry to the used ring.
 
+  pr_msg("INTR: virtio interrupt");
+
   while(disk.used_idx != disk.used->idx){
     __sync_synchronize();
     int id = disk.used->ring[disk.used_idx % NUM].id;

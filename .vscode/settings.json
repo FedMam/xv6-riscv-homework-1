@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "cstdlib": "c",
+        "spinlock.h": "c",
+        "mutex.h": "c",
+        "defs.h": "c",
+        "sleeplock.h": "c",
+        "stat.h": "c",
+        "file.h": "c",
+        "proc.h": "c",
+        "param.h": "c",
+        "syscall.h": "c"
+    }
+}

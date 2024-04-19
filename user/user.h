@@ -22,6 +22,11 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int dmesg(const char*, int);
+int newmtx(void);
+int acqmtx(int);
+int relmtx(int);
+int clsmtx(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

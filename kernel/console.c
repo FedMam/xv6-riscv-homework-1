@@ -137,9 +137,11 @@ consoleintr(int c)
 {
   acquire(&cons.lock);
 
+  char* cause;
   switch(c){
   case C('P'):  // Print process list.
     procdump();
+    cause = "procdump";
     break;
   case C('U'):  // Kill line.
     while(cons.e != cons.w &&
@@ -147,6 +149,7 @@ consoleintr(int c)
       cons.e--;
       consputc(BACKSPACE);
     }
+    cause = "kill";
     break;
   case C('H'): // Backspace
   case '\x7f': // Delete key
@@ -154,6 +157,7 @@ consoleintr(int c)
       cons.e--;
       consputc(BACKSPACE);
     }
+    cause = "backspace";
     break;
   default:
     if(c != 0 && cons.e-cons.r < INPUT_BUF_SIZE){
@@ -172,8 +176,11 @@ consoleintr(int c)
         wakeup(&cons.r);
       }
     }
+    cause = "unrecognized";
     break;
   }
+
+  pr_msg("INTR: console interrupt, type: %s (%c)", cause, C(c));
   
   release(&cons.lock);
 }

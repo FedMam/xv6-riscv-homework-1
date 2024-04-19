@@ -101,6 +101,11 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+extern uint64 sys_dmesg(void);
+extern uint64 sys_newmtx(void);
+extern uint64 sys_acqmtx(void);
+extern uint64 sys_relmtx(void);
+extern uint64 sys_clsmtx(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -126,6 +131,42 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_dmesg]   sys_dmesg,
+[SYS_newmtx]  sys_newmtx,
+[SYS_acqmtx]  sys_acqmtx,
+[SYS_relmtx]  sys_relmtx,
+[SYS_clsmtx]  sys_clsmtx
+};
+
+// system call names
+char* syscall_names[] = {
+    "null",
+    "fork",
+    "exit",
+    "wait",
+    "pipe",
+    "read",
+    "kill",
+    "exec",
+    "fstat",
+    "chdir",
+    "dup",
+    "getpid",
+    "sbrk",
+    "sleep",
+    "uptime",
+    "open",
+    "write",
+    "mknod",
+    "unlink",
+    "link",
+    "mkdir",
+    "close",
+    "dmesg",
+    "newmtx",
+    "acqmtx",
+    "relmtx",
+    "clsmtx"
 };
 
 void
@@ -135,6 +176,10 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+
+  // Event logging
+  pr_msg("SYSC: process %d making syscall %s (%d)", p->pid, syscall_names[num], num);
+
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0

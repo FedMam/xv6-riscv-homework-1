@@ -175,13 +175,32 @@ uartgetc(void)
 void
 uartintr(void)
 {
+  // we store part of the message here for logging
+  int intr_msg_size = 30;
+  char intr_msg_buf[intr_msg_size + 4];
+  int intr_msg_ctr = 0;
+
   // read and process incoming characters.
   while(1){
     int c = uartgetc();
     if(c == -1)
       break;
+
+    if (intr_msg_ctr != -1) {
+      intr_msg_buf[intr_msg_ctr] = c;
+      intr_msg_ctr++;
+      if (intr_msg_ctr >= intr_msg_size) {
+        strncpy(intr_msg_buf + intr_msg_size, "...\0", 3);
+      }
+    }
+    
     consoleintr(c);
   }
+
+  // print info about interrupt into log
+  if (intr_msg_ctr != -1)
+    intr_msg_buf[intr_msg_ctr] = 0;
+  pr_msg("INTR: UART interrupt, cause: %s", intr_msg_buf);
 
   // send buffered characters.
   acquire(&uart_tx_lock);

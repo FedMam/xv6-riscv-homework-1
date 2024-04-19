@@ -55,6 +55,10 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      
+      // initialize used mutex descriptor table
+      for (char *m = p->mutexused; m < p->mutexused + NMUTEX; m++)
+        *m = 0;
   }
 }
 
@@ -310,6 +314,12 @@ fork(void)
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
+  for (int mutex_id = 0; mutex_id < NMUTEX; mutex_id++) {
+    if (p->mutexused[mutex_id])
+      usemutex(mutex_id);
+  }
+  strncpy(np->mutexused, p->mutexused, NMUTEX);
+
   pid = np->pid;
 
   release(&np->lock);
@@ -357,6 +367,14 @@ exit(int status)
       struct file *f = p->ofile[fd];
       fileclose(f);
       p->ofile[fd] = 0;
+    }
+  }
+
+  // Close all mutexes used.
+  for (int mutex_id = 0; mutex_id < NMUTEX; mutex_id++) {
+    if (p->mutexused[mutex_id]) {
+      closemutex(mutex_id);
+      p->mutexused[mutex_id] = 0;
     }
   }
 
@@ -434,6 +452,66 @@ wait(uint64 addr)
   }
 }
 
+static void
+register_hex_dump(char* buf, uint64 reg) {
+  char* digits = "0123456789abcdef";
+
+  buf[0] = '0';
+  buf[1] = 'x';
+  uint64 pow16 = 0x1000000000000000;
+  char* p = buf + 2;
+  while (pow16 > 0) {
+    *p = digits[reg / pow16];
+    p++;
+    reg %= pow16;
+    pow16 /= 16;
+  }
+}
+
+static void
+trapframe_dump(struct trapframe *tf) {
+  return;
+
+  // 11 characters per register: 0xXXXXXXXX + space
+  char buf[sizeof(struct trapframe) / sizeof(uint64) * 11];
+  char *p = buf;
+  for (uint64* tfp = (uint64*)tf; tfp < (uint64*)tf + sizeof(struct trapframe); tfp++) {
+    register_hex_dump(p, *tfp);
+    p += 10;
+    *p = ' ';
+    p++;
+  }
+  *(p-1) = 0;
+
+  pr_msg("SWTC: trapframe dump: %s", buf);
+}
+
+static void
+context_dump(struct context *ctx, int ctx_num) {
+  return;
+
+  // 11 characters per register: 0xXXXXXXXX + space
+  char buf[sizeof(struct trapframe) / sizeof(uint64) * 11];
+  char *p = buf;
+  for (uint64* ctxp = (uint64*)ctx; ctxp < (uint64*)ctx + sizeof(struct trapframe); ctxp++) {
+    register_hex_dump(p, *ctxp);
+    p += 10;
+    *p = ' ';
+    p++;
+  }
+  *(p-1) = 0;
+
+  pr_msg("SWTC: context %d dump: %s", ctx_num, buf);
+}
+
+static void
+swtch_dump(struct trapframe *tf, struct context *c1, struct context *c2) {
+  pr_msg("SWTC: switching contexts");
+  trapframe_dump(tf);
+  context_dump(c1, 1);
+  context_dump(c2, 2);
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -460,6 +538,9 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+
+        swtch_dump(p->trapframe, &c->context, &p->context);
+
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
@@ -494,7 +575,9 @@ sched(void)
     panic("sched interruptible");
 
   intena = mycpu()->intena;
-  swtch(&p->context, &mycpu()->context);
+  struct cpu *c = mycpu();
+  swtch_dump(p->trapframe, &p->context, &c->context);
+  swtch(&p->context, &c->context);
   mycpu()->intena = intena;
 }
 

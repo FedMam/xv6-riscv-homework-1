@@ -36,3 +36,7 @@ entry("getpid");
 entry("sbrk");
 entry("sleep");
 entry("uptime");
+entry("newmtx");
+entry("acqmtx");
+entry("relmtx");
+entry("clsmtx");

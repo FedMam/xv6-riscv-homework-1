@@ -124,6 +124,15 @@ void            releasesleep(struct sleeplock*);
 int             holdingsleep(struct sleeplock*);
 void            initsleeplock(struct sleeplock*, char*);
 
+// mutex.c
+void            mutexinit(void);
+int             newmutex();
+int             usemutex(int);
+int             acquiremutex(int);
+int             releasemutex(int);
+int             holdingmutex(int);
+int             closemutex(int);
+
 // string.c
 int             memcmp(const void*, const void*, uint);
 void*           memmove(void*, const void*, uint);

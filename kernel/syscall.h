@@ -25,34 +25,3 @@
 #define SYS_acqmtx 24
 #define SYS_relmtx 25
 #define SYS_clsmtx 26
-
-// System call names
-static char* syscall_names[] = {
-    "null",
-    "fork",
-    "exit",
-    "wait",
-    "pipe",
-    "read",
-    "kill",
-    "exec",
-    "fstat",
-    "chdir",
-    "dup",
-    "getpid",
-    "sbrk",
-    "sleep",
-    "uptime",
-    "open",
-    "write",
-    "mknod",
-    "unlink",
-    "link",
-    "mkdir",
-    "close",
-    "dmesg",
-    "newmtx",
-    "acqmtx",
-    "relmtx",
-    "clsmtx"
-};

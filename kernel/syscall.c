@@ -138,6 +138,37 @@ static uint64 (*syscalls[])(void) = {
 [SYS_clsmtx]  sys_clsmtx
 };
 
+// system call names
+char* syscall_names[] = {
+    "null",
+    "fork",
+    "exit",
+    "wait",
+    "pipe",
+    "read",
+    "kill",
+    "exec",
+    "fstat",
+    "chdir",
+    "dup",
+    "getpid",
+    "sbrk",
+    "sleep",
+    "uptime",
+    "open",
+    "write",
+    "mknod",
+    "unlink",
+    "link",
+    "mkdir",
+    "close",
+    "dmesg",
+    "newmtx",
+    "acqmtx",
+    "relmtx",
+    "clsmtx"
+};
+
 void
 syscall(void)
 {

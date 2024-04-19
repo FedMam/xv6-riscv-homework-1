@@ -188,7 +188,7 @@ pr_msg(const char *fmt, ...) {
             }
             else if (c == 'c') {
                 // added this format for convenience
-                dbufferputc_nolock(va_arg(ap, char));
+                dbufferputc_nolock((char)(va_arg(ap, int) & 0xff));
             }
             else if (c == '%') {
                 dbufferputc_nolock('%');
@@ -219,15 +219,5 @@ void
 dbufferdebug(void) {
     printf("DBuffer stats:\nHead index: %d\nTail index: %d\n",
         dbuffer.head_index, dbuffer.tail_index);
-    printf("Buffer as string: %s\nBuffer contents:\n", dbuffer.buffer);
-    char *digits = "0123456789ABCDEF";
-    for (int i = 0; i < DBSIZE / 32; i++) {
-        for (int j = 0; j < 32; j++) {
-            unsigned char c = dbuffer.buffer[i * 32 + j];
-            consputc(digits[c / 16]);
-            consputc(digits[c % 16]);
-            consputc(' ');
-        }
-        consputc('\n');
-    }
+    printf("Buffer as string: %s\n", dbuffer.buffer);
 }

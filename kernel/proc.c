@@ -470,10 +470,12 @@ register_hex_dump(char* buf, uint64 reg) {
 
 static void
 trapframe_dump(struct trapframe *tf) {
+  return;
+
   // 11 characters per register: 0xXXXXXXXX + space
   char buf[sizeof(struct trapframe) / sizeof(uint64) * 11];
   char *p = buf;
-  for (uint64* tfp = tf; tfp < tf + sizeof(struct trapframe); tfp++) {
+  for (uint64* tfp = (uint64*)tf; tfp < (uint64*)tf + sizeof(struct trapframe); tfp++) {
     register_hex_dump(p, *tfp);
     p += 10;
     *p = ' ';
@@ -486,10 +488,12 @@ trapframe_dump(struct trapframe *tf) {
 
 static void
 context_dump(struct context *ctx, int ctx_num) {
+  return;
+
   // 11 characters per register: 0xXXXXXXXX + space
   char buf[sizeof(struct trapframe) / sizeof(uint64) * 11];
   char *p = buf;
-  for (uint64* ctxp = ctx; ctxp < ctx + sizeof(struct trapframe); ctxp++) {
+  for (uint64* ctxp = (uint64*)ctx; ctxp < (uint64*)ctx + sizeof(struct trapframe); ctxp++) {
     register_hex_dump(p, *ctxp);
     p += 10;
     *p = ' ';
@@ -535,7 +539,7 @@ scheduler(void)
         p->state = RUNNING;
         c->proc = p;
 
-        swtch_dump(&p->trapframe, &c->context, &p->context);
+        swtch_dump(p->trapframe, &c->context, &p->context);
 
         swtch(&c->context, &p->context);
 
@@ -572,7 +576,7 @@ sched(void)
 
   intena = mycpu()->intena;
   struct cpu *c = mycpu();
-  swtch_dump(&p->trapframe, &p->context, &c->context);
+  swtch_dump(p->trapframe, &p->context, &c->context);
   swtch(&p->context, &c->context);
   mycpu()->intena = intena;
 }

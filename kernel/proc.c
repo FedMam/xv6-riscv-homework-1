@@ -55,6 +55,10 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      
+      // initialize used mutex descriptor table
+      for (char *m = p->mutexused; m < p->mutexused + NMUTEX; m++)
+        *m = 0;
   }
 }
 
@@ -310,6 +314,12 @@ fork(void)
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
+  for (int mutex_id = 0; mutex_id < NMUTEX; mutex_id++) {
+    if (p->mutexused[mutex_id])
+      usemutex(mutex_id);
+  }
+  strncpy(np->mutexused, p->mutexused, NMUTEX);
+
   pid = np->pid;
 
   release(&np->lock);
@@ -357,6 +367,14 @@ exit(int status)
       struct file *f = p->ofile[fd];
       fileclose(f);
       p->ofile[fd] = 0;
+    }
+  }
+
+  // Close all mutexes used.
+  for (int mutex_id = 0; mutex_id < NMUTEX; mutex_id++) {
+    if (p->mutexused[mutex_id]) {
+      closemutex(mutex_id);
+      p->mutexused[mutex_id] = 0;
     }
   }
 

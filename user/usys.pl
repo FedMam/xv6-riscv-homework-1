@@ -37,3 +37,7 @@ entry("sbrk");
 entry("sleep");
 entry("uptime");
 entry("dmesg");
+entry("newmtx");
+entry("acqmtx");
+entry("relmtx");
+entry("clsmtx");

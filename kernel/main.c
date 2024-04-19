@@ -31,11 +31,6 @@ main()
     virtio_disk_init(); // emulated hard disk
     userinit();      // first user process
     __sync_synchronize();
-
-    // --
-    pr_msg("system started");
-    pr_msg("secret value is %x", 12345);
-
     started = 1;
   } else {
     while(started == 0)
